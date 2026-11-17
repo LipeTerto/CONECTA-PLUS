@@ -12,9 +12,12 @@ class AppTextField extends StatefulWidget {
     this.textInputAction,
     this.hint,
     this.prefixIcon,
+    this.suffixIcon,
     this.obscureText = false,
     this.maxLines = 1,
     this.enabled = true,
+    this.readOnly = false,
+    this.onTap,
     this.onFieldSubmitted,
   });
 
@@ -25,9 +28,12 @@ class AppTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final String? hint;
   final IconData? prefixIcon;
+  final IconData? suffixIcon;
   final bool obscureText;
   final int maxLines;
   final bool enabled;
+  final bool readOnly;
+  final VoidCallback? onTap;
   final ValueChanged<String>? onFieldSubmitted;
 
   @override
@@ -36,6 +42,20 @@ class AppTextField extends StatefulWidget {
 
 class _AppTextFieldState extends State<AppTextField> {
   late bool _obscure = widget.obscureText;
+
+  Widget? _buildSuffix() {
+    if (widget.obscureText) {
+      return IconButton(
+        tooltip: _obscure ? 'Mostrar senha' : 'Ocultar senha',
+        icon: Icon(
+          _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+        ),
+        onPressed: () => setState(() => _obscure = !_obscure),
+      );
+    }
+    if (widget.suffixIcon != null) return Icon(widget.suffixIcon);
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +67,8 @@ class _AppTextFieldState extends State<AppTextField> {
       obscureText: _obscure,
       maxLines: widget.obscureText ? 1 : widget.maxLines,
       enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
       onFieldSubmitted: widget.onFieldSubmitted,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
@@ -54,17 +76,7 @@ class _AppTextFieldState extends State<AppTextField> {
         hintText: widget.hint,
         alignLabelWithHint: widget.maxLines > 1,
         prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
-        suffixIcon: widget.obscureText
-            ? IconButton(
-                tooltip: _obscure ? 'Mostrar senha' : 'Ocultar senha',
-                icon: Icon(
-                  _obscure
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                ),
-                onPressed: () => setState(() => _obscure = !_obscure),
-              )
-            : null,
+        suffixIcon: _buildSuffix(),
       ),
     );
   }

@@ -23,8 +23,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late Future<UserModel> _profileFuture = _authService.fetchCurrentProfile();
   bool _isSigningOut = false;
 
-  void _reload() {
-    setState(() => _profileFuture = _authService.fetchCurrentProfile());
+void _reload() {
+    setState(() {
+      _profileFuture = _authService.fetchCurrentProfile();
+    });
   }
 
   Future<void> _signOut() async {

@@ -15,7 +15,7 @@ Future<void> main() async {
   // Conecta o app ao seu projeto Supabase.
   await Supabase.initialize(
     url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.publishableKey,
+    publishableKey: SupabaseConfig.publishableKey,
   );
 
   runApp(const ConectaApp());

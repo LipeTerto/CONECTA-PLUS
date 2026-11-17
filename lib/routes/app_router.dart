@@ -19,10 +19,6 @@ import '../services/auth_notifier.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/main_scaffold.dart';
 
-/// TEMPORÁRIO (Etapa 4): com true, a proteção de rotas fica desligada
-/// para você navegar pelas telas sem login. Será removido na Etapa 5.
-const bool kDevBypassAuth = true;
-
 /// Caminhos de todas as telas, num só lugar (evita erros de digitação).
 class AppRoutes {
   AppRoutes._();
@@ -160,8 +156,7 @@ class AppRouter {
 
   /// Roda a cada navegação e decide se é preciso redirecionar.
   static String? _redirect(BuildContext context, GoRouterState state) {
-    if (kDevBypassAuth) return null;
-
+    
     final loggedIn = authNotifier.isLoggedIn;
     final location = state.matchedLocation;
     final onAuthScreen =

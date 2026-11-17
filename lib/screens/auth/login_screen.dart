@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../routes/app_router.dart';
+import '../../services/auth_service.dart';
+import '../../utils/app_snackbar.dart';
 import '../../utils/validators.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
@@ -18,21 +20,35 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = AuthService();
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    // Controllers devem ser liberados quando a tela é destruída.
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _submit() {
-    // validate() roda os validators de todos os campos do Form.
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // TEMPORÁRIO (Etapa 4): só navega. A Etapa 5 troca isto pelo login real.
-    context.go(AppRoutes.home);
+    setState(() => _isLoading = true);
+    try {
+      await _authService.signIn(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      context.go(AppRoutes.home);
+    } on AuthFailure catch (e) {
+      if (!mounted) return;
+      showAppSnackBar(context, e.message, isError: true);
+    } finally {
+      // finally roda sempre, com sucesso ou erro.
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -61,6 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
                       prefixIcon: Icons.mail_outline,
+                      enabled: !_isLoading,
                     ),
                     const SizedBox(height: 16),
                     AppTextField(
@@ -71,13 +88,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: true,
                       textInputAction: TextInputAction.done,
                       prefixIcon: Icons.lock_outline,
+                      enabled: !_isLoading,
                       onFieldSubmitted: (_) => _submit(),
                     ),
                     const SizedBox(height: 24),
-                    AppButton(label: 'Entrar', onPressed: _submit),
+                    AppButton(
+                      label: 'Entrar',
+                      onPressed: _submit,
+                      isLoading: _isLoading,
+                    ),
                     const SizedBox(height: 12),
                     TextButton(
-                      onPressed: () => context.go(AppRoutes.register),
+                      onPressed:
+                          _isLoading ? null : () => context.go(AppRoutes.register),
                       child: const Text('Não tem conta? Cadastre-se'),
                     ),
                   ],

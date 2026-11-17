@@ -32,7 +32,8 @@ class InfoRow extends StatelessWidget {
                 style: textTheme.labelSmall?.copyWith(color: AppTheme.textMuted),
               ),
               const SizedBox(height: 2),
-              Text(value, style: textTheme.bodyLarge),
+              // Selecionável: permite copiar telefone, endereço, site etc.
+              SelectableText(value, style: textTheme.bodyLarge),
             ],
           ),
         ),

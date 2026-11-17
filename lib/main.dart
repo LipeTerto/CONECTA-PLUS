@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,8 +12,7 @@ Future<void> main() async {
   // Carrega os nomes de meses e dias em português (usado pelo intl).
   await initializeDateFormatting('pt_BR');
 
-  // Conecta o app ao seu projeto Supabase. O parâmetro se chama anonKey
-  // por histórico, mas aceita a publishable key.
+  // Conecta o app ao seu projeto Supabase.
   await Supabase.initialize(
     url: SupabaseConfig.url,
     anonKey: SupabaseConfig.publishableKey,

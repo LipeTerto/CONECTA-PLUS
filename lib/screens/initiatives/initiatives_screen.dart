@@ -5,10 +5,9 @@ import '../../models/initiative_model.dart';
 import '../../routes/app_router.dart';
 import '../../services/initiative_service.dart';
 import '../../services/service_failure.dart';
-import '../../theme/app_theme.dart';
 import '../../widgets/content_wrapper.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../../widgets/item_card.dart';
+import '../../widgets/item_cards.dart';
 import '../../widgets/loading_widget.dart';
 
 class InitiativesScreen extends StatefulWidget {
@@ -103,12 +102,8 @@ class _InitiativesScreenState extends State<InitiativesScreen> {
                 separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final item = items[index];
-                  return ItemCard(
-                    title: item.title,
-                    subtitle: '${item.organizationName} • ${item.location}',
-                    category: item.category,
-                    icon: Icons.lightbulb,
-                    color: AppTheme.initiativesColor,
+                                    return InitiativeCard(
+                    initiative: item,
                     onTap: () => _openDetails(item),
                   );
                 },

@@ -27,6 +27,23 @@ class InstitutionService {
     }
   }
 
+    /// Os cadastros mais recentes (usado nos destaques da Home).
+  Future<List<InstitutionModel>> fetchRecent({int limit = 3}) async {
+    try {
+      final rows = await _client
+          .from(_table)
+          .select()
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return rows.map(InstitutionModel.fromMap).toList();
+    } catch (e) {
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível carregar os destaques.',
+      );
+    }
+  }
+
   Future<InstitutionModel> fetchById(String id) async {
     try {
       final row =

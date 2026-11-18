@@ -13,6 +13,8 @@ import '../../widgets/content_wrapper.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/info_row.dart';
 import '../../widgets/loading_widget.dart';
+import '../../models/favorite_model.dart';
+import '../../widgets/favorite_button.dart';
 
 class InitiativeDetailsScreen extends StatefulWidget {
   const InitiativeDetailsScreen({super.key, required this.initiativeId});
@@ -71,7 +73,15 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes da iniciativa')),
+            appBar: AppBar(
+        title: const Text('Detalhes da iniciativa'),
+        actions: [
+          FavoriteButton(
+            type: FavoriteType.initiative,
+            itemId: widget.initiativeId,
+          ),
+        ],
+      ),
       body: FutureBuilder<InitiativeModel>(
         future: _future,
         builder: (context, snapshot) {

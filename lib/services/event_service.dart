@@ -37,6 +37,23 @@ class EventService {
     }
   }
 
+    /// Os cadastros mais recentes (usado nos destaques da Home).
+  Future<List<EventModel>> fetchRecent({int limit = 3}) async {
+    try {
+      final rows = await _client
+          .from(_table)
+          .select()
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return rows.map(EventModel.fromMap).toList();
+    } catch (e) {
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível carregar os destaques.',
+      );
+    }
+  }
+
   Future<EventModel> fetchById(String id) async {
     try {
       final row =

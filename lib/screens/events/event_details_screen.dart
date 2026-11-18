@@ -13,6 +13,8 @@ import '../../widgets/content_wrapper.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/info_row.dart';
 import '../../widgets/loading_widget.dart';
+import '../../models/favorite_model.dart';
+import '../../widgets/favorite_button.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   const EventDetailsScreen({super.key, required this.eventId});
@@ -67,7 +69,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes do evento')),
+            appBar: AppBar(
+        title: const Text('Detalhes do evento'),
+        actions: [
+          FavoriteButton(type: FavoriteType.event, itemId: widget.eventId),
+        ],
+      ),
       body: FutureBuilder<EventModel>(
         future: _eventFuture,
         builder: (context, snapshot) {

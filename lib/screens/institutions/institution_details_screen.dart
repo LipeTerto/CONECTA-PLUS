@@ -13,6 +13,8 @@ import '../../widgets/content_wrapper.dart';
 import '../../widgets/empty_state_widget.dart';
 import '../../widgets/info_row.dart';
 import '../../widgets/loading_widget.dart';
+import '../../models/favorite_model.dart';
+import '../../widgets/favorite_button.dart';
 
 class InstitutionDetailsScreen extends StatefulWidget {
   const InstitutionDetailsScreen({super.key, required this.institutionId});
@@ -71,7 +73,15 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes da instituição')),
+            appBar: AppBar(
+        title: const Text('Detalhes da instituição'),
+        actions: [
+          FavoriteButton(
+            type: FavoriteType.institution,
+            itemId: widget.institutionId,
+          ),
+        ],
+      ),
       body: FutureBuilder<InstitutionModel>(
         future: _future,
         builder: (context, snapshot) {

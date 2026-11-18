@@ -5,10 +5,9 @@ import '../../models/institution_model.dart';
 import '../../routes/app_router.dart';
 import '../../services/institution_service.dart';
 import '../../services/service_failure.dart';
-import '../../theme/app_theme.dart';
 import '../../widgets/content_wrapper.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../../widgets/item_card.dart';
+import '../../widgets/item_cards.dart';
 import '../../widgets/loading_widget.dart';
 
 class InstitutionsScreen extends StatefulWidget {
@@ -103,12 +102,8 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
                 separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final item = items[index];
-                  return ItemCard(
-                    title: item.name,
-                    subtitle: item.address,
-                    category: item.category,
-                    icon: Icons.volunteer_activism,
-                    color: AppTheme.institutionsColor,
+                                    return InstitutionCard(
+                    institution: item,
                     onTap: () => _openDetails(item),
                   );
                 },

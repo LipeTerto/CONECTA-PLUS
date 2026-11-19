@@ -18,13 +18,15 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ItemCard(
       title: event.title,
-      subtitle: '${Formatters.date(event.eventDate)} • '
+      subtitle:
+          '${Formatters.date(event.eventDate)} • '
           '${Formatters.time(event.eventTime)} • '
           '${event.locationName}',
       category: event.category,
       icon: Icons.event,
       color: AppTheme.eventsColor,
       onTap: onTap,
+      isCancelled: event.isCancelled,
     );
   }
 }
@@ -49,6 +51,7 @@ class InstitutionCard extends StatelessWidget {
       icon: Icons.volunteer_activism,
       color: AppTheme.institutionsColor,
       onTap: onTap,
+      isCancelled: institution.isCancelled,
     );
   }
 }
@@ -73,6 +76,7 @@ class InitiativeCard extends StatelessWidget {
       icon: Icons.lightbulb,
       color: AppTheme.initiativesColor,
       onTap: onTap,
+      isCancelled: initiative.isCancelled,
     );
   }
 }

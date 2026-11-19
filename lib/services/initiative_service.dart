@@ -5,7 +5,7 @@ import 'service_failure.dart';
 
 class InitiativeService {
   InitiativeService({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
   static const String _table = 'initiatives';
@@ -29,7 +29,7 @@ class InitiativeService {
     }
   }
 
-    /// Os cadastros mais recentes (usado nos destaques da Home).
+  /// Os cadastros mais recentes (usado nos destaques da Home).
   Future<List<InitiativeModel>> fetchRecent({int limit = 3}) async {
     try {
       final rows = await _client
@@ -48,8 +48,11 @@ class InitiativeService {
 
   Future<InitiativeModel> fetchById(String id) async {
     try {
-      final row =
-          await _client.from(_table).select().eq('id', id).maybeSingle();
+      final row = await _client
+          .from(_table)
+          .select()
+          .eq('id', id)
+          .maybeSingle();
       if (row == null) {
         throw const ServiceFailure(
           'Iniciativa não encontrada. Ela pode ter sido excluída.',
@@ -125,6 +128,28 @@ class InitiativeService {
       throw ServiceFailure.from(
         e,
         fallback: 'Não foi possível excluir a iniciativa.',
+      );
+    }
+  }
+
+  Future<void> setCancelled(String id, bool cancelled) async {
+    try {
+      final rows = await _client
+          .from(_table)
+          .update({'is_cancelled': cancelled})
+          .eq('id', id)
+          .select();
+
+      if (rows.isEmpty) {
+        throw const ServiceFailure(
+          'Não foi possível alterar o status: apenas quem cadastrou a '
+          'iniciativa pode fazer isso.',
+        );
+      }
+    } catch (e) {
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível alterar o status da iniciativa.',
       );
     }
   }

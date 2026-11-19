@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
+import 'status_widgets.dart';
 
 /// Card reutilizável para os três módulos. Muda só o ícone e a cor.
 class ItemCard extends StatelessWidget {
@@ -12,6 +13,7 @@ class ItemCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.isCancelled = false,
   });
 
   final String title;
@@ -20,10 +22,13 @@ class ItemCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+  final bool isCancelled;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // Cancelado: troca a cor do módulo por cinza.
+    final accent = isCancelled ? AppTheme.textMuted : color;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -38,10 +43,10 @@ class ItemCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.14),
+                  color: accent.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: color),
+                child: Icon(icon, color: accent),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -52,34 +57,47 @@ class ItemCard extends StatelessWidget {
                       title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isCancelled ? AppTheme.textMuted : null,
+                        decoration: isCancelled
+                            ? TextDecoration.lineThrough
+                            : null,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: AppTheme.textMuted),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textMuted,
+                      ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        category,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppTheme.textDark,
-                          fontWeight: FontWeight.w600,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: accent.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            category,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppTheme.textDark,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
+                        if (isCancelled) const CancelledBadge(),
+                      ],
                     ),
                   ],
                 ),

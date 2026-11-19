@@ -15,6 +15,8 @@ import '../../widgets/info_row.dart';
 import '../../widgets/loading_widget.dart';
 import '../../models/favorite_model.dart';
 import '../../widgets/favorite_button.dart';
+import '../../widgets/cancel_toggle_button.dart';
+import '../../widgets/status_widgets.dart';
 
 class InstitutionDetailsScreen extends StatefulWidget {
   const InstitutionDetailsScreen({super.key, required this.institutionId});
@@ -28,8 +30,9 @@ class InstitutionDetailsScreen extends StatefulWidget {
 
 class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
   final _service = InstitutionService();
-  late Future<InstitutionModel> _future =
-      _service.fetchById(widget.institutionId);
+  late Future<InstitutionModel> _future = _service.fetchById(
+    widget.institutionId,
+  );
   bool _isDeleting = false;
 
   void _reload() {
@@ -50,7 +53,8 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
     final confirmed = await showConfirmDialog(
       context,
       title: 'Excluir instituição?',
-      message: 'A instituição "${institution.name}" será removida '
+      message:
+          'A instituição "${institution.name}" será removida '
           'permanentemente. Esta ação não pode ser desfeita.',
       confirmLabel: 'Excluir',
       destructive: true,
@@ -73,7 +77,7 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
+      appBar: AppBar(
         title: const Text('Detalhes da instituição'),
         actions: [
           FavoriteButton(
@@ -111,7 +115,8 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
   Widget _buildContent(InstitutionModel institution) {
     final textTheme = Theme.of(context).textTheme;
     // Só o autor vê os botões. (A segurança real é do RLS no banco.)
-    final isOwner = institution.userId != null &&
+    final isOwner =
+        institution.userId != null &&
         institution.userId == _service.currentUserId;
 
     return ContentWrapper(
@@ -120,9 +125,17 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
         children: [
           Text(
             institution.name,
-            style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 16),
+          if (institution.isCancelled) ...[
+            const CancelledBanner(
+              message: 'Esta instituição foi marcada como cancelada pelo responsável.',
+            ),
+            const SizedBox(height: 16),
+          ],
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -166,8 +179,9 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
                 children: [
                   Text(
                     'Sobre a instituição',
-                    style: textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(institution.description, style: textTheme.bodyLarge),
@@ -189,6 +203,14 @@ class _InstitutionDetailsScreenState extends State<InstitutionDetailsScreen> {
               label: 'Editar instituição',
               icon: Icons.edit_outlined,
               onPressed: _edit,
+            ),
+            const SizedBox(height: 12),
+            CancelToggleButton(
+              itemName: 'instituição',
+              isCancelled: institution.isCancelled,
+              onChange: (cancelled) =>
+                  _service.setCancelled(widget.institutionId, cancelled),
+              onChanged: _reload,
             ),
             const SizedBox(height: 12),
             AppButton(

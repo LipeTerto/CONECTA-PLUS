@@ -15,6 +15,8 @@ import '../../widgets/info_row.dart';
 import '../../widgets/loading_widget.dart';
 import '../../models/favorite_model.dart';
 import '../../widgets/favorite_button.dart';
+import '../../widgets/cancel_toggle_button.dart';
+import '../../widgets/status_widgets.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   const EventDetailsScreen({super.key, required this.eventId});
@@ -46,7 +48,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final confirmed = await showConfirmDialog(
       context,
       title: 'Excluir evento?',
-      message: 'O evento "${event.title}" será removido permanentemente. '
+      message:
+          'O evento "${event.title}" será removido permanentemente. '
           'Esta ação não pode ser desfeita.',
       confirmLabel: 'Excluir',
       destructive: true,
@@ -69,7 +72,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
+      appBar: AppBar(
         title: const Text('Detalhes do evento'),
         actions: [
           FavoriteButton(type: FavoriteType.event, itemId: widget.eventId),
@@ -113,9 +116,17 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         children: [
           Text(
             event.title,
-            style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 16),
+          if (event.isCancelled) ...[
+            const CancelledBanner(
+              message: 'Este evento foi cancelado pelo responsável.',
+            ),
+            const SizedBox(height: 16),
+          ],
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -169,8 +180,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 children: [
                   Text(
                     'Sobre o evento',
-                    style: textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(event.description, style: textTheme.bodyLarge),
@@ -192,6 +204,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               label: 'Editar evento',
               icon: Icons.edit_outlined,
               onPressed: _edit,
+            ),
+            const SizedBox(height: 12),
+            CancelToggleButton(
+              itemName: 'evento',
+              isCancelled: event.isCancelled,
+              onChange: (cancelled) =>
+                  _service.setCancelled(widget.eventId, cancelled),
+              onChanged: _reload,
             ),
             const SizedBox(height: 12),
             AppButton(

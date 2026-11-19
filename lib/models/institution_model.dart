@@ -10,6 +10,7 @@ class InstitutionModel {
     required this.contactInfo,
     this.website,
     this.createdAt,
+    this.isCancelled = false,
   });
 
   final String? id; // null até ser salva
@@ -21,6 +22,7 @@ class InstitutionModel {
   final String contactInfo;
   final String? website; // opcional
   final DateTime? createdAt;
+  final bool isCancelled;
 
   /// Banco → objeto.
   factory InstitutionModel.fromMap(Map<String, dynamic> map) {
@@ -35,6 +37,7 @@ class InstitutionModel {
       website: map['website'] as String?,
       createdAt: DateTime.tryParse(map['created_at']?.toString() ?? '')
           ?.toLocal(),
+      isCancelled: map['is_cancelled'] as bool? ?? false,
     );
   }
 

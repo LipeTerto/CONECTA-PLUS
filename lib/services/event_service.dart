@@ -5,7 +5,7 @@ import 'service_failure.dart';
 
 class EventService {
   EventService({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
   static const String _table = 'events';
@@ -27,17 +27,21 @@ class EventService {
 
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final upcoming =
-          events.where((e) => !e.eventDate.isBefore(today)).toList();
+      final upcoming = events
+          .where((e) => !e.eventDate.isBefore(today))
+          .toList();
       final past = events.where((e) => e.eventDate.isBefore(today)).toList();
 
       return [...upcoming, ...past.reversed];
     } catch (e) {
-      throw ServiceFailure.from(e, fallback: 'Não foi possível carregar os eventos.');
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível carregar os eventos.',
+      );
     }
   }
 
-    /// Os cadastros mais recentes (usado nos destaques da Home).
+  /// Os cadastros mais recentes (usado nos destaques da Home).
   Future<List<EventModel>> fetchRecent({int limit = 3}) async {
     try {
       final rows = await _client
@@ -56,8 +60,11 @@ class EventService {
 
   Future<EventModel> fetchById(String id) async {
     try {
-      final row =
-          await _client.from(_table).select().eq('id', id).maybeSingle();
+      final row = await _client
+          .from(_table)
+          .select()
+          .eq('id', id)
+          .maybeSingle();
       if (row == null) {
         throw const ServiceFailure(
           'Evento não encontrado. Ele pode ter sido excluído.',
@@ -65,7 +72,10 @@ class EventService {
       }
       return EventModel.fromMap(row);
     } catch (e) {
-      throw ServiceFailure.from(e, fallback: 'Não foi possível carregar o evento.');
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível carregar o evento.',
+      );
     }
   }
 
@@ -79,7 +89,10 @@ class EventService {
           .single();
       return EventModel.fromMap(row);
     } catch (e) {
-      throw ServiceFailure.from(e, fallback: 'Não foi possível cadastrar o evento.');
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível cadastrar o evento.',
+      );
     }
   }
 
@@ -89,8 +102,11 @@ class EventService {
 
     try {
       // .select() no final faz o banco devolver as linhas alteradas.
-      final rows =
-          await _client.from(_table).update(event.toMap()).eq('id', id).select();
+      final rows = await _client
+          .from(_table)
+          .update(event.toMap())
+          .eq('id', id)
+          .select();
 
       // Com RLS, editar um registro de outra pessoa NÃO gera erro: o banco
       // apenas não encontra nenhuma linha "visível para edição". Por isso
@@ -102,7 +118,10 @@ class EventService {
       }
       return EventModel.fromMap(rows.first);
     } catch (e) {
-      throw ServiceFailure.from(e, fallback: 'Não foi possível salvar o evento.');
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível salvar o evento.',
+      );
     }
   }
 
@@ -117,7 +136,33 @@ class EventService {
         );
       }
     } catch (e) {
-      throw ServiceFailure.from(e, fallback: 'Não foi possível excluir o evento.');
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível excluir o evento.',
+      );
+    }
+  }
+
+  /// Marca (ou desmarca) o evento como cancelado.
+  Future<void> setCancelled(String id, bool cancelled) async {
+    try {
+      final rows = await _client
+          .from(_table)
+          .update({'is_cancelled': cancelled})
+          .eq('id', id)
+          .select();
+
+      if (rows.isEmpty) {
+        throw const ServiceFailure(
+          'Não foi possível alterar o status: apenas quem cadastrou o '
+          'evento pode fazer isso.',
+        );
+      }
+    } catch (e) {
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível alterar o status do evento.',
+      );
     }
   }
 }

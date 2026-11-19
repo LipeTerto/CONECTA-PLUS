@@ -6,6 +6,7 @@ Future<bool> showConfirmDialog(
   required String title,
   required String message,
   String confirmLabel = 'Confirmar',
+  String cancelLabel = 'Cancelar',
   bool destructive = false,
 }) async {
   final errorColor = Theme.of(context).colorScheme.error;
@@ -18,7 +19,7 @@ Future<bool> showConfirmDialog(
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: const Text('Cancelar'),
+          child: Text(cancelLabel),
         ),
         FilledButton(
           style: destructive

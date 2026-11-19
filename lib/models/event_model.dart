@@ -14,6 +14,7 @@ class EventModel {
     required this.address,
     required this.organizerName,
     this.createdAt,
+    this.isCancelled = false,
   });
 
   final String? id; // null até o evento ser salvo
@@ -27,6 +28,7 @@ class EventModel {
   final String address;
   final String organizerName;
   final DateTime? createdAt;
+  final bool isCancelled;
 
   /// Banco → objeto. O Supabase devolve cada linha como um Map.
   factory EventModel.fromMap(Map<String, dynamic> map) {
@@ -43,6 +45,7 @@ class EventModel {
       organizerName: map['organizer_name'] as String,
       createdAt: DateTime.tryParse(map['created_at']?.toString() ?? '')
           ?.toLocal(),
+      isCancelled: map['is_cancelled'] as bool? ?? false,
     );
   }
 

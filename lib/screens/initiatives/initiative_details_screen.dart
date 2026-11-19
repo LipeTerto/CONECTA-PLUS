@@ -15,6 +15,8 @@ import '../../widgets/info_row.dart';
 import '../../widgets/loading_widget.dart';
 import '../../models/favorite_model.dart';
 import '../../widgets/favorite_button.dart';
+import '../../widgets/cancel_toggle_button.dart';
+import '../../widgets/status_widgets.dart';
 
 class InitiativeDetailsScreen extends StatefulWidget {
   const InitiativeDetailsScreen({super.key, required this.initiativeId});
@@ -28,8 +30,9 @@ class InitiativeDetailsScreen extends StatefulWidget {
 
 class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
   final _service = InitiativeService();
-  late Future<InitiativeModel> _future =
-      _service.fetchById(widget.initiativeId);
+  late Future<InitiativeModel> _future = _service.fetchById(
+    widget.initiativeId,
+  );
   bool _isDeleting = false;
 
   void _reload() {
@@ -50,7 +53,8 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
     final confirmed = await showConfirmDialog(
       context,
       title: 'Excluir iniciativa?',
-      message: 'A iniciativa "${initiative.title}" será removida '
+      message:
+          'A iniciativa "${initiative.title}" será removida '
           'permanentemente. Esta ação não pode ser desfeita.',
       confirmLabel: 'Excluir',
       destructive: true,
@@ -73,7 +77,7 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
+      appBar: AppBar(
         title: const Text('Detalhes da iniciativa'),
         actions: [
           FavoriteButton(
@@ -111,7 +115,8 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
   Widget _buildContent(InitiativeModel initiative) {
     final textTheme = Theme.of(context).textTheme;
     // Só o autor vê os botões. (A segurança real é do RLS no banco.)
-    final isOwner = initiative.userId != null &&
+    final isOwner =
+        initiative.userId != null &&
         initiative.userId == _service.currentUserId;
 
     return ContentWrapper(
@@ -120,9 +125,17 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
         children: [
           Text(
             initiative.title,
-            style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 16),
+          if (initiative.isCancelled) ...[
+            const CancelledBanner(
+              message: 'Esta iniciativa foi cancelada pelo responsável.',
+            ),
+            const SizedBox(height: 16),
+          ],
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -166,8 +179,9 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
                 children: [
                   Text(
                     'Sobre a iniciativa',
-                    style: textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(initiative.description, style: textTheme.bodyLarge),
@@ -189,6 +203,14 @@ class _InitiativeDetailsScreenState extends State<InitiativeDetailsScreen> {
               label: 'Editar iniciativa',
               icon: Icons.edit_outlined,
               onPressed: _edit,
+            ),
+            const SizedBox(height: 12),
+            CancelToggleButton(
+              itemName: 'iniciativa',
+              isCancelled: initiative.isCancelled,
+              onChange: (cancelled) =>
+                  _service.setCancelled(widget.initiativeId, cancelled),
+              onChanged: _reload,
             ),
             const SizedBox(height: 12),
             AppButton(

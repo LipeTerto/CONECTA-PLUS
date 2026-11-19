@@ -29,6 +29,7 @@ create table public.events (
   location_name  text not null,
   address        text not null,
   organizer_name text not null,
+  is_cancelled   boolean not null default false,
   created_at     timestamptz not null default now()
 );
 
@@ -42,7 +43,8 @@ create table public.institutions (
   category     text not null,
   address      text not null,
   contact_info text not null,
-  website      text,                       -- opcional
+  website      text,
+  is_cancelled   boolean not null default false,
   created_at   timestamptz not null default now()
 );
 
@@ -57,6 +59,7 @@ create table public.initiatives (
   organization_name text not null,
   location          text not null,
   contact_info      text,                  -- opcional
+  is_cancelled      boolean not null default false,
   created_at        timestamptz not null default now()
 );
 

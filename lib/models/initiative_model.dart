@@ -10,6 +10,7 @@ class InitiativeModel {
     required this.location,
     this.contactInfo,
     this.createdAt,
+    this.isCancelled = false,
   });
 
   final String? id; // null até ser salva
@@ -21,6 +22,7 @@ class InitiativeModel {
   final String location;
   final String? contactInfo; // opcional
   final DateTime? createdAt;
+  final bool isCancelled;
 
   /// Banco → objeto.
   factory InitiativeModel.fromMap(Map<String, dynamic> map) {
@@ -35,6 +37,7 @@ class InitiativeModel {
       contactInfo: map['contact_info'] as String?,
       createdAt: DateTime.tryParse(map['created_at']?.toString() ?? '')
           ?.toLocal(),
+      isCancelled: map['is_cancelled'] as bool? ?? false,
     );
   }
 

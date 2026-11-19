@@ -5,7 +5,7 @@ import 'service_failure.dart';
 
 class InstitutionService {
   InstitutionService({SupabaseClient? client})
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   final SupabaseClient _client;
   static const String _table = 'institutions';
@@ -16,8 +16,10 @@ class InstitutionService {
   /// Todas as instituições, em ordem alfabética.
   Future<List<InstitutionModel>> fetchAll() async {
     try {
-      final rows =
-          await _client.from(_table).select().order('name', ascending: true);
+      final rows = await _client
+          .from(_table)
+          .select()
+          .order('name', ascending: true);
       return rows.map(InstitutionModel.fromMap).toList();
     } catch (e) {
       throw ServiceFailure.from(
@@ -27,7 +29,7 @@ class InstitutionService {
     }
   }
 
-    /// Os cadastros mais recentes (usado nos destaques da Home).
+  /// Os cadastros mais recentes (usado nos destaques da Home).
   Future<List<InstitutionModel>> fetchRecent({int limit = 3}) async {
     try {
       final rows = await _client
@@ -46,8 +48,11 @@ class InstitutionService {
 
   Future<InstitutionModel> fetchById(String id) async {
     try {
-      final row =
-          await _client.from(_table).select().eq('id', id).maybeSingle();
+      final row = await _client
+          .from(_table)
+          .select()
+          .eq('id', id)
+          .maybeSingle();
       if (row == null) {
         throw const ServiceFailure(
           'Instituição não encontrada. Ela pode ter sido excluída.',
@@ -123,6 +128,28 @@ class InstitutionService {
       throw ServiceFailure.from(
         e,
         fallback: 'Não foi possível excluir a instituição.',
+      );
+    }
+  }
+
+  Future<void> setCancelled(String id, bool cancelled) async {
+    try {
+      final rows = await _client
+          .from(_table)
+          .update({'is_cancelled': cancelled})
+          .eq('id', id)
+          .select();
+
+      if (rows.isEmpty) {
+        throw const ServiceFailure(
+          'Não foi possível alterar o status: apenas quem cadastrou a '
+          'instituição pode fazer isso.',
+        );
+      }
+    } catch (e) {
+      throw ServiceFailure.from(
+        e,
+        fallback: 'Não foi possível alterar o status da instituição.',
       );
     }
   }
